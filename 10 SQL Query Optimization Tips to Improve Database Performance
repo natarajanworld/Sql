@@ -1,0 +1,15 @@
+Top 10 SQL Query Optimization Tips to Improve Database Performance
+
+Indexing: Ensure proper indexing for quick access to the database.
+Select query: Specify the columns in SELECT query instead of SELECT* to avoid extra fetching load on the database.
+Running queries: Loops in query structure slows the sequence. Thus, avoid them.
+Matching records: Use EXITS() for matching if the record exists.
+Subqueries: Avoid correlated sub queries as it searches row by row, impacting the speed of SQL query processing.
+Wildcards: Use wildcards (e.g. %xx%) wisely as they search the entire database for matching results.
+Operators: Avoid using function at RHS of the operator.
+Fetching data: Always fetch limited data.
+Loading: Use a temporary table to handle bulk data.
+Selecting Rows: Use the clause WHERE instead of HAVING for primary filters.
+
+
+https://www.mantralabsglobal.com/blog/sql-query-optimization-tips/
