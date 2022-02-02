@@ -1,0 +1,109 @@
+REF LINK: https://www.c-sharpcorner.com/article/improve-stored-procedure-performance-in-sql-server-store-procedure-performance/
+
+Pick specific columns in a select statement which you want to use, don't use select *
+
+Here in the below snippet, I have written two select statements which are used to fetch records from employeedetail table. The first one is best practices, which means I pick the specific column in the select statement. In the second snippet I have used select * but it is not recommended to use this when fetching records from the table. 
+--- Always do specific columns    
+select FirstName,LastName, AddressLine1, Country from EmployeeDetail    
+    
+--- Do not Do    
+select * from EmployeeDetail  
+Do not create your procedure name prefix with sp_ always use different prefix i.e. usp_YourStoreProcName.
+
+SP_StoreProcName is bad practice because when SQL server searches for procedure name then it will first search in the master database then your database. If you prefix with SP_ then it will start looking in system procedures so it will take more time. 
+-- Do not create like this      
+Create procedure [dbo].[sp_GetEmployeeDetails]      
+@EmployeeId int      
+As      
+Begin      
+select FirstName,LastName, AddressLine1, Country from EmployeeDetail where EmployeeId=@EmployeeId       
+End       
+      
+-- Always keep prefix different from sp_      
+Create procedure [dbo].[usp_GetEmployeeDetails]      
+@EmployeeId int      
+As      
+Begin      
+SET NOCOUNT ON      
+select FirstName,LastName, AddressLine1, Country from EmployeeDetail where EmployeeId=@EmployeeId       
+End        
+Use If Exists to check if record exists in table or not
+
+If Exists function is used to check if record exists in a table or not.  If any records are found then it will return true, else it will return false. One benefit of using If Exists function is that if any match is found then it will stop execution and return true so it will not process the remaining records, so that will save time and improve performance.
+
+In the below example I have used If exists function with select 1 and select *. We should always use select 1 because for the If Exist function it doesn't matter how many records there are;  it checks for any record and if it finds one it will return true.
+-- When you want to check for the record is there in the table    
+-- Do's    
+ Use IF Exists(select 1 from EmployeeDetail where EmployeeId=@EmployeeId)    
+    
+--Dont's    
+ Use IF Exists(select * from EmployeeDetail where EmployeeId=@EmployeeId)  
+    
+Keep your transaction as short as possible 
+
+When we are performing multiple inserts, updates or deletes in a single batch  it is required to check that all of the operation eigher succeeded or failed. In this situation, we should go for the transaction. When we are using transaction in store procedure that time we need to make sure that transaction should be very small, and it should not block other operations. The length of the transaction affects blocking and sometimes it ends up in  a deadlock.
+Use try-catch block for error handling
+
+Error handling is a core part of any application. SQL server 2005 and 2008 have a new simple way of handling error using a try-catch block.
+BEGIN TRY  
+--SQL Statement  
+--DML Statement
+--Select Statement
+END TRY  
+BEGIN CATCH  
+--Error handling code 
+--Your logic to handle error  
+END CATCH  
+Use schema name with object name
+
+Schema name should be used with store procedure name because it will help to compile the plan. It will not search in another schema before deciding to use the cached plan. So always prefix your object with the schema name.
+
+-- Always keep prefix different from sp_          
+Create procedure [dbo].[usp_GetEmployeeDetails]          
+@EmployeeId int          
+As          
+Begin          
+SET NOCOUNT ON          
+select FirstName,LastName, AddressLine1, Country from EmployeeDetail where EmployeeId=@EmployeeId           
+End      
+Set NOCOUNT ON statement at beginning of Store procedure
+
+In the first procedure, I have not used SET NOCOUNT ON statement so it has printed a message for how many rows are affected. It means if we do not use this then it will print an extra message and it affects performance.
+
+-- Always keep prefix different from sp_        
+Create procedure [dbo].[usp_GetEmployeeDetails]
+@EmployeeId int        
+As        
+Begin        
+      
+select FirstName,LastName, AddressLine1, Contry from EmployeeDetail       
+End        
+Improve Stored Procedure Performance In SQL Server/ Store Procedure Performance Tuning
+ 
+In the below procedure, I have user SET NOCOUNT ON so it is not returning the how many rows are affected message. This message doesn't matter for limited numbers of records but when we are dealing with a large number of records it matters a lot. So always use SET NOCOUNT ON statement at the top of your store procedure. 
+-- USING SET NOCOUNT ON STATEMENT        
+CREATE procedure [dbo].[usp_GetEmployeeDetails]
+As          
+Begin          
+SET NOCOUNT ON  
+select FirstName,LastName, AddressLine1, Contry from EmployeeDetail where Contry ='Ind'           
+End  
+Improve Stored Procedure Performance In SQL Server/ Store Procedure Performance Tuning 
+Use the Primary key & Index properly in the table
+It is good practice to use primary key for each table and indexes in appropriate scenarios. It will speed up retrieving and searching records from the database. Here we have three snippets to understand a few points about how select statement works in different scenarios.
+
+In the first screen I have used table Employee1 where I do not have a primary key for the table and I have to tried to retrieve data from the table, then perform the table scan.
+ 
+Improve Stored Procedure Performance In SQL Server/ Store Procedure Performance Tuning
+In the second screen I have another table, EmployeeDetail, which has primary key EmployeeId and I have tried to retrieve all data from employee table but it performs Index scan because it has the primary key. So it's good to have a primary key for each table. If you create a primary key on column it will create a cluster index on that column. Index scan is better than the table scan. 
+ 
+Improve Stored Procedure Performance In SQL Server/ Store Procedure Performance Tuning
+
+In the below screen, you can see I have a primary key column and I have used a primary key cloumn in the where clause, so it is performing Index scan which is better than the above two in performance. 
+
+Improve Stored Procedure Performance In SQL Server/ Store Procedure Performance Tuning
+A few more points we can keep in mind while writting store procedure:
+While writing store procedure avoid aggregate function in where clause because it reduces performance.
+Try to write program logic in the business layer of the application not in store procedure. 
+Try to avoid cursor inside procedure if it is possible.
+Try to avoid DDL operation in store procedure because DDL operation may change execution plan so SP can not reuse the same plan. 
