@@ -1,0 +1,123 @@
+ref link:https://www.c-sharpcorner.com/UploadFile/rohatash/select-insert-update-delete-using-stored-procedure-in-sql/
+=====================================================================================================================
+Store procedure:
+create PROCEDURE Masterinsertupdatedelete (@id            INTEGER,
+                                          @first_name    VARCHAR(10),
+                                          @last_name     VARCHAR(10),
+                                          @salary        DECIMAL(10, 2),
+                                          @city          VARCHAR(20),
+                                          @StatementType NVARCHAR(20) = '')
+AS
+  BEGIN
+      IF @StatementType = 'Insert'
+        BEGIN
+            INSERT INTO employee
+                        (id,
+                         first_name,
+                         last_name,
+                         salary,
+                         city)
+            VALUES     ( @id,
+                         @first_name,
+                         @last_name,
+                         @salary,
+                         @city)
+        END
+
+      IF @StatementType = 'Select'
+        BEGIN
+            SELECT *
+            FROM   employee
+        END
+
+      IF @StatementType = 'Update'
+        BEGIN
+            UPDATE employee
+            SET    first_name = @first_name,
+                   last_name = @last_name,
+                   salary = @salary,
+                   city = @city
+            WHERE  id = @id
+        END
+      ELSE IF @StatementType = 'Delete'
+        BEGIN
+            DELETE FROM employee
+            WHERE  id = @id
+        END
+  END
+  =====================================================================================================================
+  USE [test]
+GO
+
+DECLARE	@return_value int
+
+EXEC	@return_value = [dbo].[Masterinsertupdatedelete]
+		@id = 7,
+		@first_name = N'nat',
+		@last_name = N'rajan',
+		@salary = 800,
+		@city = N'tambaram',
+		@StatementType = N'Insert'
+
+SELECT	'Return Value' = @return_value
+
+GO
+
+  =====================================================================================================================
+
+USE [test]
+GO
+
+DECLARE	@return_value int
+
+EXEC	@return_value = [dbo].[Masterinsertupdatedelete]
+		@id = 7,
+		@first_name = N'natarajan',
+		@last_name = N'arumugam',
+		@salary = 8000,
+		@city = N'Tambaram',
+		@StatementType = N'Update'
+
+SELECT	'Return Value' = @return_value
+
+GO
+
+
+  =====================================================================================================================
+
+
+USE [test]
+GO
+
+DECLARE	@return_value int
+
+EXEC	@return_value = [dbo].[Masterinsertupdatedelete]
+		@id = 0,
+		@first_name = 'a',
+		@last_name = 'a',
+		@salary = 8,
+		@city = '',
+		@StatementType = N'Select'
+
+SELECT	'Return Value' = @return_value
+
+GO
+  =====================================================================================================================
+
+USE [test]
+GO
+
+DECLARE	@return_value int
+
+EXEC	@return_value = [dbo].[Masterinsertupdatedelete]
+		@id = 2,
+		@first_name = 'a',
+		@last_name = 'a',
+		@salary = 8,
+		@city = '',
+		@StatementType = N'Delete'
+
+SELECT	'Return Value' = @return_value
+
+GO
+  =====================================================================================================================
