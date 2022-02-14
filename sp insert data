@@ -1,0 +1,100 @@
+CREATE TABLE [dbo].[countires](
+	[ID] [int] NULL,
+	[name] [varchar](255) NULL
+)
+
+CREATE TABLE [dbo].[states](
+	[ID] [int] NULL,
+	[country_id] [int] NULL,
+	[name] [varchar](255) NULL
+) 
+
+
+CREATE TABLE [dbo].[city](
+	[ID] [int] NULL,
+	[country_id] [int] NULL,
+	[state_id] [int] NULL,
+	[name] [varchar](255) NULL
+) 
+
+CREATE TABLE [dbo].[temptable](
+	[ID] [int] NULL,
+	[countryname] [varchar](25) NULL,
+	[statename] [varchar](25) NULL,
+	[cityname] [varchar](25) NULL
+)
+
+Store procedure
+
+
+USE [our_first_database]
+GO
+
+/****** Object:  StoredProcedure [dbo].[insertCityData]    Script Date: 14-02-2022 06:56:52 ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+CREATE PROCEDURE [dbo].[insertCityData](
+@EndDate VARCHAR(50))
+
+AS
+
+BEGIN
+ SET NOCOUNT ON;
+	 BEGIN
+	
+	 DECLARE @countryname VARCHAR(150) 
+	 DECLARE @statename VARCHAR(150) 
+	 DECLARE @cityname VARCHAR(50) 
+	  DECLARE @countryId NVARCHAR(50) =''
+	 DECLARE @stateId NVARCHAR(50) =''
+		 --FOR SELECT countryname,statename,cityname  from temptable 
+		 --FOR SELECT countryname  from temptable 
+		 	--FETCH NEXT FROM cursor_branch INTO @countryname,@statename,@cityname;	 
+				--FETCH NEXT FROM cursor_branch INTO @countryname;	
+				
+						--print( @statename )
+							--		print( @cityname )
+								--FETCH NEXT FROM cursor_branch INTO @countryname,@statename,@cityname;
+							--FETCH NEXT FROM cursor_branch INTO @countryname;
+				
+						BEGIN
+							 DECLARE cityInsertC CURSOR
+	
+							   FOR SELECT countryname,statename,cityname  from temptable 
+							END
+												OPEN cityInsertC;
+			 
+												FETCH NEXT FROM cityInsertC INTO 
+												@countryname,
+												@statename,@cityname;	 
+												WHILE @@FETCH_STATUS = 0
+														BEGIN
+
+															set @countryId =(select  id from countires where name=@countryname)
+									set @stateId =(select  id from states where name=@statename)
+																		print( @countryname )
+
+																		insert into city values(2,@countryId ,@stateId,@cityname)
+				
+
+
+
+
+						
+															FETCH NEXT FROM cityInsertC INTO @countryname,
+												@statename,@cityname;	 
+
+														END;
+												CLOSE cityInsertC;
+
+
+						END
+	
+SET NOCOUNT OFF;
+END
+GO
+
